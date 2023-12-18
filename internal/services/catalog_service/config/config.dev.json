@@ -1,0 +1,24 @@
+{
+  "appOptions": {
+    "serviceName": "order_service"
+  },
+  "ginHttpServerOptions": {
+    "port": ":5001"
+  },
+  "gormOptions": {
+    "port": 5432,
+    "host": "catalog-service-db",
+    "user": "admin",
+    "password": "admin",
+    "db": "catalog_service"
+  },
+  "migrationOptions": {
+    "port": 5432,
+    "host": "catalog-service-db",
+    "user": "admin",
+    "password": "admin",
+    "db": "catalog_service",
+    "migrationsDir": "db/migrations",
+    "skipMigrations": false
+  }
+}

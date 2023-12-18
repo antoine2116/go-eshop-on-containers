@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  catalog-service:
+    container_name: catalog-service
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    volumes:
+      - ./:/app
+    ports:
+      - "5001:5001"
+      - "40000:40000"
+    # Enable this if you want to debug the container
+    security_opt:
+      - "seccomp:unconfined"
+    cap_add:
+      - SYS_PTRACE
+    depends_on:
+      - catalog-service-db
+
+  catalog-service-db:
+    container_name: catalog-db
+    image: postgres:12.3-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: catalog_service
+    ports:
+      - "5432:5432"
