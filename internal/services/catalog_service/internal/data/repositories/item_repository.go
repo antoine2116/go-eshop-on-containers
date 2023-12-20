@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"errors"
 	"github.com/antoine2116/go-eshop-on-containers/internal/pkg/utils"
 	"github.com/antoine2116/go-eshop-on-containers/internal/services/catalogservice/internal/models"
 	"go.uber.org/zap"
@@ -59,7 +60,10 @@ func (r *itemRepository) GetItemById(
 ) (*models.Item, error) {
 	var item *models.Item
 
-	err := r.db.WithContext(ctx).Where("id = ?", id).First(&item).Error
+	err := r.db.WithContext(ctx).First(&item, id).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}
