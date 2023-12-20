@@ -40,7 +40,7 @@ func (ep *getItemByIdEndpoint) handler() gin.HandlerFunc {
 			return
 		}
 
-		item, err := ep.ItemRepository.GetItemById(ctx, request.ItemId)
+		item, err := ep.ItemRepository.GetItemById(ctx, request.Id)
 		if err != nil {
 			internalServerErr := customErrors.NewInternalServerError(err)
 			c.Error(internalServerErr)
@@ -49,7 +49,7 @@ func (ep *getItemByIdEndpoint) handler() gin.HandlerFunc {
 
 		if item == nil {
 			notFoundErr := customErrors.NewNotFoundError(
-				fmt.Sprintf("Can't find the item with id %d into the database.", request.ItemId),
+				fmt.Sprintf("Can't find the item with id %d into the database.", request.Id),
 				err,
 			)
 			c.Error(notFoundErr)

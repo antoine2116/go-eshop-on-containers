@@ -12,6 +12,7 @@ import (
 type ItemRepository interface {
 	GetAllItems(ctx context.Context, query *utils.PaginationQuery) (*utils.PaginationResult[*models.Item], error)
 	GetItemById(ctx context.Context, id int) (*models.Item, error)
+	GetItemsWithName(ctx context.Context, query *utils.PaginationQuery, name string) (*utils.PaginationResult[*models.Item], error)
 }
 
 type itemRepository struct {
@@ -69,4 +70,33 @@ func (r *itemRepository) GetItemById(
 	}
 
 	return item, nil
+}
+
+func (r *itemRepository) GetItemsWithName(
+	ctx context.Context,
+	query *utils.PaginationQuery,
+	name string,
+) (*utils.PaginationResult[*models.Item], error) {
+	var items []*models.Item
+	var count int64
+
+	err := r.db.WithContext(ctx).
+		Model(items).
+		Where("name LIKE ?", name+"%").
+		Count(&count).Error
+	if err != nil {
+		return nil, err
+	}
+
+	dbQuery := r.db.WithContext(ctx).
+		Where("name LIKE ?", name+"%").
+		Offset(query.GetOffset()).
+		Limit(query.GetLimit())
+
+	err = dbQuery.Find(&items).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return utils.NewPaginationResult[*models.Item](query.PageIndex, query.PageSize, count, items), nil
 }
