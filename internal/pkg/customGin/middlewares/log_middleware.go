@@ -24,13 +24,6 @@ func GinLogger(logger *zap.Logger) gin.HandlerFunc {
 			zap.String("user-agent", req.UserAgent()),
 			zap.Duration("latency", latency),
 		}
-
-		if len(ctx.Errors) > 0 {
-			for _, err := range ctx.Errors.Errors() {
-				logger.Error(err, fields...)
-			}
-		} else {
-			logger.Info(req.URL.Path, fields...)
-		}
+		logger.Info(req.URL.Path, fields...)
 	}
 }

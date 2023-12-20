@@ -29,8 +29,9 @@ type ginHttpServer struct {
 func NewGinHttpServer(logger *zap.Logger, config *config.GinHttpServerOptions) GinHttpServer {
 	router := gin.New()
 
-	router.Use(gin.Recovery())
 	router.Use(middlewares.GinLogger(logger))
+	router.Use(middlewares.ErrorHandler(logger))
+
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"},

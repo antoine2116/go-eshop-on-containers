@@ -2,9 +2,9 @@ package endpoints
 
 import (
 	"github.com/antoine2116/go-eshop-on-containers/internal/pkg/customGin"
+	customErrors "github.com/antoine2116/go-eshop-on-containers/internal/pkg/http/custom_errors"
 	"github.com/antoine2116/go-eshop-on-containers/internal/pkg/utils"
 	"github.com/antoine2116/go-eshop-on-containers/internal/services/catalogservice/internal/contracts/params"
-	"github.com/antoine2116/go-eshop-on-containers/internal/services/catalogservice/internal/data/repositories"
 	dtosV1 "github.com/antoine2116/go-eshop-on-containers/internal/services/catalogservice/internal/dtos/v1"
 	"github.com/antoine2116/go-eshop-on-containers/internal/services/catalogservice/internal/features/getting_items/v1/dtos"
 	"github.com/gin-gonic/gin"
@@ -12,19 +12,17 @@ import (
 )
 
 type getItemsEndpoint struct {
-	params params.CatalogRouteParams
-	repo   repositories.ItemRepository
+	params.CatalogRouteParams
 }
 
-func NewGetItemsEndpoint(params params.CatalogRouteParams, repo repositories.ItemRepository) customGin.Endpoint {
+func NewGetItemsEndpoint(params params.CatalogRouteParams) customGin.Endpoint {
 	return &getItemsEndpoint{
-		params: params,
-		repo:   repo,
+		CatalogRouteParams: params,
 	}
 }
 
 func (ep *getItemsEndpoint) MapEndpoint() {
-	ep.params.CatalogGroup.GET("/items", ep.handler())
+	ep.CatalogGroup.GET("/items", ep.handler())
 }
 
 func (ep *getItemsEndpoint) handler() gin.HandlerFunc {
@@ -33,21 +31,27 @@ func (ep *getItemsEndpoint) handler() gin.HandlerFunc {
 
 		paginationQuery, err := utils.GetPaginationQueryFromCtx(c)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, "Error in getting data from query string")
+			badRequestErr := customErrors.NewBadRequestError(
+				"Error in getting data from query string.",
+				err,
+			)
+			c.Error(badRequestErr)
 			return
 		}
 
 		query := dtos.GetItemsRequestDto{PaginationQuery: paginationQuery}
 
-		items, err := ep.repo.GetAllItems(ctx, query.PaginationQuery)
+		items, err := ep.ItemRepository.GetAllItems(ctx, query.PaginationQuery)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, "Error in requesting the database")
+			internalServerErr := customErrors.NewInternalServerError(err)
+			c.Error(internalServerErr)
 			return
 		}
 
 		paginationResultDto, err := utils.PaginationResultToPaginationResultDto[*dtosV1.ItemDto](items)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, "Error in mapping to dto")
+			internalServerErr := customErrors.NewInternalServerError(err)
+			c.Error(internalServerErr)
 			return
 		}
 
