@@ -41,7 +41,26 @@ func (ep *getItemsEndpoint) handler() gin.HandlerFunc {
 
 		query := dtos.GetItemsRequestDto{PaginationQuery: paginationQuery}
 
-		items, err := ep.ItemRepository.GetAllItems(ctx, query.PaginationQuery)
+		if err := c.BindQuery(&query); err != nil {
+			badRequestErr := customErrors.NewBadRequestError(
+				"Error in getting data from query string.",
+				err,
+			)
+			c.Error(badRequestErr)
+			return
+		}
+
+		ids, err := utils.StringToIntArray(query.Ids)
+		if err != nil {
+			badRequestErr := customErrors.NewBadRequestError(
+				"Ids value invalid. Must be comma-separated list of numbers",
+				err,
+			)
+			c.Error(badRequestErr)
+			return
+		}
+
+		items, err := ep.ItemRepository.GetAllItems(ctx, query.PaginationQuery, ids)
 		if err != nil {
 			internalServerErr := customErrors.NewInternalServerError(err)
 			c.Error(internalServerErr)

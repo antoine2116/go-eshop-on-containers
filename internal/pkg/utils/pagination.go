@@ -29,9 +29,8 @@ const (
 )
 
 type PaginationQuery struct {
-	PageIndex int   `json:"pageIndex"`
-	PageSize  int   `json:"pageSize"`
-	Ids       []int `json:"ids"`
+	PageIndex int `json:"pageIndex"`
+	PageSize  int `json:"pageSize"`
 }
 
 func (q *PaginationQuery) SetPageIndex(index string) error {
@@ -66,21 +65,6 @@ func (q *PaginationQuery) SetPageSize(size string) error {
 	return nil
 }
 
-func (q *PaginationQuery) SetIds(ids string) error {
-	if ids == "" {
-		return nil
-	}
-
-	a, err := StringToIntArray(ids)
-	if err != nil {
-		return err
-	}
-
-	q.Ids = a
-
-	return nil
-}
-
 func (q *PaginationQuery) GetOffset() int {
 	return (q.PageIndex) * q.PageSize
 }
@@ -99,11 +83,6 @@ func GetPaginationQueryFromCtx(c *gin.Context) (*PaginationQuery, error) {
 
 	size := c.Query("pageSize")
 	if err := q.SetPageSize(size); err != nil {
-		return nil, err
-	}
-
-	ids := c.Query("ids")
-	if err := q.SetIds(ids); err != nil {
 		return nil, err
 	}
 

@@ -10,7 +10,7 @@ import (
 )
 
 type ItemRepository interface {
-	GetAllItems(ctx context.Context, query *utils.PaginationQuery) (*utils.PaginationResult[*models.Item], error)
+	GetAllItems(ctx context.Context, query *utils.PaginationQuery, ids []int) (*utils.PaginationResult[*models.Item], error)
 	GetItemById(ctx context.Context, id int) (*models.Item, error)
 	GetItemsWithName(ctx context.Context, query *utils.PaginationQuery, name string) (*utils.PaginationResult[*models.Item], error)
 }
@@ -30,6 +30,7 @@ func NewItemRepository(logger *zap.Logger, db *gorm.DB) ItemRepository {
 func (r *itemRepository) GetAllItems(
 	ctx context.Context,
 	query *utils.PaginationQuery,
+	ids []int,
 ) (*utils.PaginationResult[*models.Item], error) {
 	var items []*models.Item
 	var count int64
@@ -43,8 +44,8 @@ func (r *itemRepository) GetAllItems(
 		Offset(query.GetOffset()).
 		Limit(query.GetLimit())
 
-	if len(query.Ids) > 0 {
-		dbQuery.Where("id IN ?", query.Ids)
+	if len(ids) > 0 {
+		dbQuery.Where("id IN ?", ids)
 	}
 
 	err = dbQuery.Find(&items).Error
