@@ -40,7 +40,7 @@ func (ep *getItemByIdEndpoint) handler() gin.HandlerFunc {
 			return
 		}
 
-		item, err := ep.ItemRepository.GetItemById(ctx, request.Id)
+		item, err := ep.Repository.GetItemById(ctx, request.Id)
 		if err != nil {
 			internalServerErr := customErrors.NewInternalServerError(err)
 			c.Error(internalServerErr)

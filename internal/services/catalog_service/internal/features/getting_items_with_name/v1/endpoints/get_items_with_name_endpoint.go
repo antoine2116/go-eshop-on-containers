@@ -51,7 +51,7 @@ func (ep *getItemWithNameEndpoint) handler() gin.HandlerFunc {
 
 		request.PaginationQuery = paginationQuery
 
-		items, err := ep.ItemRepository.GetItemsWithName(ctx, request.PaginationQuery, request.Name)
+		items, err := ep.Repository.GetItemsWithName(ctx, request.PaginationQuery, request.Name)
 		if err != nil {
 			internalServerErr := customErrors.NewInternalServerError(err)
 			c.Error(internalServerErr)

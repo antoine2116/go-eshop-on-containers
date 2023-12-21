@@ -51,7 +51,7 @@ func (ep *getItemsByTypeIdAndBrandIdEndpoint) handler() gin.HandlerFunc {
 
 		request.PaginationQuery = paginationQuery
 
-		items, err := ep.ItemRepository.GetItemsByTypeIdAndBrandId(ctx, request.PaginationQuery, request.TypeId, request.BrandId)
+		items, err := ep.Repository.GetItemsByTypeIdAndBrandId(ctx, request.PaginationQuery, request.TypeId, request.BrandId)
 		if err != nil {
 			internalServerErr := customErrors.NewInternalServerError(err)
 			c.Error(internalServerErr)

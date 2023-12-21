@@ -51,7 +51,7 @@ func (ep *getItemsByBrandId) handler() gin.HandlerFunc {
 
 		request.PaginationQuery = paginationQuery
 
-		items, err := ep.ItemRepository.GetItemsByBrandId(ctx, request.PaginationQuery, request.BrandId)
+		items, err := ep.Repository.GetItemsByBrandId(ctx, request.PaginationQuery, request.BrandId)
 		if err != nil {
 			internalServerErr := customErrors.NewInternalServerError(err)
 			c.Error(internalServerErr)

@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type ItemRepository interface {
+type CatalogRepository interface {
 	GetAllItems(ctx context.Context, pagination *utils.PaginationQuery, ids []int) (*utils.PaginationResult[*models.Item], error)
 	GetItemById(ctx context.Context, id int) (*models.Item, error)
 	GetItemsWithName(ctx context.Context, pagination *utils.PaginationQuery, name string) (*utils.PaginationResult[*models.Item], error)
@@ -17,19 +17,19 @@ type ItemRepository interface {
 	GetItemsByBrandId(ctx context.Context, pagination *utils.PaginationQuery, brandId int) (*utils.PaginationResult[*models.Item], error)
 }
 
-type itemRepository struct {
+type catalogRepository struct {
 	logger *zap.Logger
 	db     *gorm.DB
 }
 
-func NewItemRepository(logger *zap.Logger, db *gorm.DB) ItemRepository {
-	return &itemRepository{
+func NewItemRepository(logger *zap.Logger, db *gorm.DB) CatalogRepository {
+	return &catalogRepository{
 		logger: logger,
 		db:     db,
 	}
 }
 
-func (r *itemRepository) GetAllItems(
+func (r *catalogRepository) GetAllItems(
 	ctx context.Context,
 	pagination *utils.PaginationQuery,
 	ids []int,
@@ -59,7 +59,7 @@ func (r *itemRepository) GetAllItems(
 	return utils.NewPaginationResult[*models.Item](pagination.PageIndex, pagination.PageSize, count, items), nil
 }
 
-func (r *itemRepository) GetItemById(
+func (r *catalogRepository) GetItemById(
 	ctx context.Context,
 	id int,
 ) (*models.Item, error) {
@@ -79,7 +79,7 @@ func (r *itemRepository) GetItemById(
 	return item, nil
 }
 
-func (r *itemRepository) GetItemsWithName(
+func (r *catalogRepository) GetItemsWithName(
 	ctx context.Context,
 	pagination *utils.PaginationQuery,
 	name string,
@@ -107,7 +107,7 @@ func (r *itemRepository) GetItemsWithName(
 	return utils.NewPaginationResult[*models.Item](pagination.PageIndex, pagination.PageSize, count, items), nil
 }
 
-func (r *itemRepository) GetItemsByTypeIdAndBrandId(
+func (r *catalogRepository) GetItemsByTypeIdAndBrandId(
 	ctx context.Context,
 	pagination *utils.PaginationQuery,
 	typeId, brandId int,
@@ -138,7 +138,7 @@ func (r *itemRepository) GetItemsByTypeIdAndBrandId(
 	return utils.NewPaginationResult[*models.Item](pagination.PageIndex, pagination.PageSize, count, items), nil
 }
 
-func (r *itemRepository) GetItemsByBrandId(
+func (r *catalogRepository) GetItemsByBrandId(
 	ctx context.Context,
 	pagination *utils.PaginationQuery,
 	brandId int,

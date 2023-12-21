@@ -60,7 +60,7 @@ func (ep *getItemsEndpoint) handler() gin.HandlerFunc {
 			return
 		}
 
-		items, err := ep.ItemRepository.GetAllItems(ctx, query.PaginationQuery, ids)
+		items, err := ep.Repository.GetAllItems(ctx, query.PaginationQuery, ids)
 		if err != nil {
 			internalServerErr := customErrors.NewInternalServerError(err)
 			c.Error(internalServerErr)

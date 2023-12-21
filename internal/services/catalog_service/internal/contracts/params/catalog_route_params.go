@@ -10,7 +10,7 @@ import (
 type CatalogRouteParams struct {
 	fx.In
 
-	CatalogGroup   *gin.RouterGroup
-	Logger         *zap.Logger
-	ItemRepository repositories.ItemRepository
+	CatalogGroup *gin.RouterGroup
+	Logger       *zap.Logger
+	Repository   repositories.CatalogRepository
 }
