@@ -9,8 +9,8 @@ type ItemDto struct {
 	Price             float64   `json:"price"`
 	PictureFileName   string    `json:"pictureFileName"`
 	PictureUri        string    `json:"pictureUri"`
-	CatalogType       TypeDto   `json:"catalogType"`
-	CatalogBrand      BrandDto  `json:"catalogBrand"`
+	Type              TypeDto   `json:"type"`
+	Brand             BrandDto  `json:"brand"`
 	AvailableStock    int       `json:"availableStock"`
 	RestockThreshold  int       `json:"restockThreshold"`
 	MaxStockThreshold int       `json:"maxStockThreshold"`

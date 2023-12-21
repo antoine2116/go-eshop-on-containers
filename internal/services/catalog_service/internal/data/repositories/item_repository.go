@@ -10,9 +10,10 @@ import (
 )
 
 type ItemRepository interface {
-	GetAllItems(ctx context.Context, query *utils.PaginationQuery, ids []int) (*utils.PaginationResult[*models.Item], error)
+	GetAllItems(ctx context.Context, pagination *utils.PaginationQuery, ids []int) (*utils.PaginationResult[*models.Item], error)
 	GetItemById(ctx context.Context, id int) (*models.Item, error)
-	GetItemsWithName(ctx context.Context, query *utils.PaginationQuery, name string) (*utils.PaginationResult[*models.Item], error)
+	GetItemsWithName(ctx context.Context, pagination *utils.PaginationQuery, name string) (*utils.PaginationResult[*models.Item], error)
+	GetItemsByTypeIdAndBrandId(ctx context.Context, pagination *utils.PaginationQuery, typeId, brandId int) (*utils.PaginationResult[*models.Item], error)
 }
 
 type itemRepository struct {
@@ -29,7 +30,7 @@ func NewItemRepository(logger *zap.Logger, db *gorm.DB) ItemRepository {
 
 func (r *itemRepository) GetAllItems(
 	ctx context.Context,
-	query *utils.PaginationQuery,
+	pagination *utils.PaginationQuery,
 	ids []int,
 ) (*utils.PaginationResult[*models.Item], error) {
 	var items []*models.Item
@@ -40,20 +41,21 @@ func (r *itemRepository) GetAllItems(
 		return nil, err
 	}
 
-	dbQuery := r.db.WithContext(ctx).
-		Offset(query.GetOffset()).
-		Limit(query.GetLimit())
+	query := r.db.WithContext(ctx).
+		Preload("Brand").Preload("Type").
+		Offset(pagination.GetOffset()).
+		Limit(pagination.GetLimit())
 
 	if len(ids) > 0 {
-		dbQuery.Where("id IN ?", ids)
+		query.Where("id IN ?", ids)
 	}
 
-	err = dbQuery.Find(&items).Error
+	err = query.Find(&items).Error
 	if err != nil {
 		return nil, err
 	}
 
-	return utils.NewPaginationResult[*models.Item](query.PageIndex, query.PageSize, count, items), nil
+	return utils.NewPaginationResult[*models.Item](pagination.PageIndex, pagination.PageSize, count, items), nil
 }
 
 func (r *itemRepository) GetItemById(
@@ -62,7 +64,10 @@ func (r *itemRepository) GetItemById(
 ) (*models.Item, error) {
 	var item *models.Item
 
-	err := r.db.WithContext(ctx).First(&item, id).Error
+	query := r.db.WithContext(ctx).
+		Preload("Brand").Preload("Type")
+
+	err := query.First(&item, id).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}
@@ -75,29 +80,59 @@ func (r *itemRepository) GetItemById(
 
 func (r *itemRepository) GetItemsWithName(
 	ctx context.Context,
-	query *utils.PaginationQuery,
+	pagination *utils.PaginationQuery,
 	name string,
 ) (*utils.PaginationResult[*models.Item], error) {
 	var items []*models.Item
 	var count int64
 
-	err := r.db.WithContext(ctx).
-		Model(items).
-		Where("name LIKE ?", name+"%").
-		Count(&count).Error
+	root := r.db.Where("name LIKE ?", name+"%")
+
+	err := root.WithContext(ctx).Model(items).Count(&count).Error
 	if err != nil {
 		return nil, err
 	}
 
-	dbQuery := r.db.WithContext(ctx).
-		Where("name LIKE ?", name+"%").
-		Offset(query.GetOffset()).
-		Limit(query.GetLimit())
+	query := root.WithContext(ctx).
+		Preload("Brand").Preload("Type").
+		Offset(pagination.GetOffset()).
+		Limit(pagination.GetLimit())
 
-	err = dbQuery.Find(&items).Error
+	err = query.Find(&items).Error
 	if err != nil {
 		return nil, err
 	}
 
-	return utils.NewPaginationResult[*models.Item](query.PageIndex, query.PageSize, count, items), nil
+	return utils.NewPaginationResult[*models.Item](pagination.PageIndex, pagination.PageSize, count, items), nil
+}
+
+func (r *itemRepository) GetItemsByTypeIdAndBrandId(
+	ctx context.Context,
+	pagination *utils.PaginationQuery,
+	typeId, brandId int,
+) (*utils.PaginationResult[*models.Item], error) {
+	var items []*models.Item
+	var count int64
+
+	root := r.db.Where("type_id = ?", typeId)
+	if brandId != 0 {
+		root.Where("brand_id = ?", brandId)
+	}
+
+	err := root.WithContext(ctx).Model(items).Count(&count).Error
+	if err != nil {
+		return nil, err
+	}
+
+	query := root.WithContext(ctx).
+		Preload("Brand").Preload("Type").
+		Offset(pagination.GetOffset()).
+		Limit(pagination.GetLimit())
+
+	err = query.Find(&items).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return utils.NewPaginationResult[*models.Item](pagination.PageIndex, pagination.PageSize, count, items), nil
 }

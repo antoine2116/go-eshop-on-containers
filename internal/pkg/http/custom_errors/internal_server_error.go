@@ -12,6 +12,6 @@ type InternalServerError interface {
 
 func NewInternalServerError(err error) error {
 	return &internalServerError{
-		NewCustomError(http.StatusInternalServerError, "", err),
+		NewCustomError(http.StatusInternalServerError, "An unexpected error occurred during request", err),
 	}
 }

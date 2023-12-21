@@ -11,10 +11,10 @@ type Item struct {
 	Price             float64   `json:"price"`
 	PictureFileName   string    `json:"pictureFileName"`
 	PictureUri        string    `json:"pictureUri"`
-	CatalogTypeId     int       `json:"catalogTypeId"`
-	CatalogType       Type      `json:"catalogType" gorm:"foreignKey:CatalogTypeId"`
-	CatalogBrandId    int       `json:"catalogBrandId"`
-	CatalogBrand      Brand     `json:"catalogBrand" gorm:"foreignKey:CatalogBrandId"`
+	TypeId            int       `json:"TypeId"`
+	Type              Type      `json:"Type" gorm:"foreignKey:TypeId"`
+	BrandId           int       `json:"BrandId"`
+	Brand             Brand     `json:"Brand" gorm:"foreignKey:BrandId"`
 	AvailableStock    int       `json:"availableStock"`
 	RestockThreshold  int       `json:"restockThreshold"`
 	MaxStockThreshold int       `json:"maxStockThreshold"`
