@@ -11,6 +11,7 @@ import (
 	getItemsV1 "github.com/antoine2116/go-eshop-on-containers/internal/services/catalogservice/internal/features/getting_items/v1/endpoints"
 	getItemsByTypeIdAndBrandIdV1 "github.com/antoine2116/go-eshop-on-containers/internal/services/catalogservice/internal/features/getting_items_by_type_id_and_brand_id/v1/endpoints"
 	getItemsWithNameV1 "github.com/antoine2116/go-eshop-on-containers/internal/services/catalogservice/internal/features/getting_items_with_name/v1/endpoints"
+	getItemsByBrandIdV1 "github.com/antoine2116/go-eshop-on-containers/internal/services/catalogservice/internal/features/gettings_items_by_brand_id/v1/endpoints"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/fx"
 )
@@ -40,5 +41,6 @@ var Module = fx.Module(
 		customGin.AsRoute(getItemByIdV1.NewGetItemByIdEndpoint, "catalog-route"),
 		customGin.AsRoute(getItemsWithNameV1.NewGetItemWithNameEndpoint, "catalog-route"),
 		customGin.AsRoute(getItemsByTypeIdAndBrandIdV1.NewGetItemsByTypeIdAndBrandIdEndpoint, "catalog-route"),
+		customGin.AsRoute(getItemsByBrandIdV1.NewGetItemsBrandIdEndpoint, "catalog-route"),
 	),
 )

@@ -14,6 +14,7 @@ type ItemRepository interface {
 	GetItemById(ctx context.Context, id int) (*models.Item, error)
 	GetItemsWithName(ctx context.Context, pagination *utils.PaginationQuery, name string) (*utils.PaginationResult[*models.Item], error)
 	GetItemsByTypeIdAndBrandId(ctx context.Context, pagination *utils.PaginationQuery, typeId, brandId int) (*utils.PaginationResult[*models.Item], error)
+	GetItemsByBrandId(ctx context.Context, pagination *utils.PaginationQuery, brandId int) (*utils.PaginationResult[*models.Item], error)
 }
 
 type itemRepository struct {
@@ -118,6 +119,34 @@ func (r *itemRepository) GetItemsByTypeIdAndBrandId(
 	if brandId != 0 {
 		root.Where("brand_id = ?", brandId)
 	}
+
+	err := root.WithContext(ctx).Model(items).Count(&count).Error
+	if err != nil {
+		return nil, err
+	}
+
+	query := root.WithContext(ctx).
+		Preload("Brand").Preload("Type").
+		Offset(pagination.GetOffset()).
+		Limit(pagination.GetLimit())
+
+	err = query.Find(&items).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return utils.NewPaginationResult[*models.Item](pagination.PageIndex, pagination.PageSize, count, items), nil
+}
+
+func (r *itemRepository) GetItemsByBrandId(
+	ctx context.Context,
+	pagination *utils.PaginationQuery,
+	brandId int,
+) (*utils.PaginationResult[*models.Item], error) {
+	var items []*models.Item
+	var count int64
+
+	root := r.db.Where("brand_id = ?", brandId)
 
 	err := root.WithContext(ctx).Model(items).Count(&count).Error
 	if err != nil {
