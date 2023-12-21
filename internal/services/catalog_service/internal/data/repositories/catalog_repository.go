@@ -15,6 +15,8 @@ type CatalogRepository interface {
 	GetItemsWithName(ctx context.Context, pagination *utils.PaginationQuery, name string) (*utils.PaginationResult[*models.Item], error)
 	GetItemsByTypeIdAndBrandId(ctx context.Context, pagination *utils.PaginationQuery, typeId, brandId int) (*utils.PaginationResult[*models.Item], error)
 	GetItemsByBrandId(ctx context.Context, pagination *utils.PaginationQuery, brandId int) (*utils.PaginationResult[*models.Item], error)
+	GetAllTypes(ctx context.Context) ([]*models.Type, error)
+	GetAllBrands(ctx context.Context) ([]*models.Brand, error)
 }
 
 type catalogRepository struct {
@@ -164,4 +166,34 @@ func (r *catalogRepository) GetItemsByBrandId(
 	}
 
 	return utils.NewPaginationResult[*models.Item](pagination.PageIndex, pagination.PageSize, count, items), nil
+}
+
+func (r *catalogRepository) GetAllTypes(
+	ctx context.Context,
+) ([]*models.Type, error) {
+	var types []*models.Type
+
+	query := r.db.WithContext(ctx)
+
+	err := query.Find(&types).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return types, nil
+}
+
+func (r *catalogRepository) GetAllBrands(
+	ctx context.Context,
+) ([]*models.Brand, error) {
+	var brands []*models.Brand
+
+	query := r.db.WithContext(ctx)
+
+	err := query.Find(&brands).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return brands, nil
 }
