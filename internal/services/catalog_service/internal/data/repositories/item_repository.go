@@ -117,7 +117,7 @@ func (r *itemRepository) GetItemsByTypeIdAndBrandId(
 
 	root := r.db.Where("type_id = ?", typeId)
 	if brandId != 0 {
-		root.Where("brand_id = ?", brandId)
+		root = root.Where("brand_id = ?", brandId)
 	}
 
 	err := root.WithContext(ctx).Model(items).Count(&count).Error

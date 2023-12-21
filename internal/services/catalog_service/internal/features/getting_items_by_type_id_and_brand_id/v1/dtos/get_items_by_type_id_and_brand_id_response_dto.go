@@ -5,6 +5,6 @@ import (
 	dtosV1 "github.com/antoine2116/go-eshop-on-containers/internal/services/catalogservice/internal/dtos/v1"
 )
 
-type GetItemsByTypeIdAndBrandItResponseDto struct {
+type GetItemsByTypeIdAndBrandIdResponseDto struct {
 	Items *utils.PaginationResult[*dtosV1.ItemDto] `json:"items"`
 }

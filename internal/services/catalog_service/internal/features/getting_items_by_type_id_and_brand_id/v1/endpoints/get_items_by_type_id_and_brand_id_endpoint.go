@@ -22,14 +22,14 @@ func NewGetItemsByTypeIdAndBrandIdEndpoint(params params.CatalogRouteParams) cus
 }
 
 func (ep *getItemsByTypeIdAndBrandIdEndpoint) MapEndpoint() {
-	ep.CatalogGroup.GET("/items/type/:typeId/brand/:brandId?", ep.handler())
+	ep.CatalogGroup.GET("/items/type/:typeId/brand/:brandId", ep.handler())
 }
 
 func (ep *getItemsByTypeIdAndBrandIdEndpoint) handler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx := c.Request.Context()
 
-		request := &dtos.GetItemsByTypeIdAndBrandItRequestDto{}
+		request := &dtos.GetItemsByTypeIdAndBrandIdRequestDto{}
 		if err := c.BindUri(request); err != nil {
 			badRequestErr := customErrors.NewBadRequestError(
 				"Error in getting data from path parameter.",
@@ -65,6 +65,6 @@ func (ep *getItemsByTypeIdAndBrandIdEndpoint) handler() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, &dtos.GetItemsByTypeIdAndBrandItResponseDto{Items: paginationResultDto})
+		c.JSON(http.StatusOK, &dtos.GetItemsByTypeIdAndBrandIdResponseDto{Items: paginationResultDto})
 	}
 }
